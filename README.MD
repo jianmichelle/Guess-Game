@@ -5,16 +5,6 @@ Instant feedback, confetti for correct answers, vibration for wrong guesses, and
 
 ---
 
-## Screenshots 📸
-
-### Start Screen
-![Start Screen](path-to-your-start-screen.png)
-
-### Gameplay & Leaderboard
-![Gameplay](path-to-your-gameplay-screen.png)
-
----
-
 ## How to Play ▶️
 
 1. Open the `index.html` file in your browser to start the game.
@@ -37,4 +27,5 @@ Instant feedback, confetti for correct answers, vibration for wrong guesses, and
 - Vibration for wrong guesses 📳
 - Leaderboard to track top attempts 🏆
 - Reset option for endless replay 🔁
+
 
