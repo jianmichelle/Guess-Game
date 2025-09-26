@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Guessing Game 🎮</title>
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 0;
+      min-height: 100vh;
+    }
+    .container {
+      display: none;
+      gap: 2rem;
+      flex-wrap: wrap;
+      max-width: 900px;
+      width: 100%;
+    }
+    .game-box, .leaderboard-box {
+      background: rgba(0, 0, 0, 0.75);
+      padding: 2rem;
+      border-radius: 15px;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.5);
+      flex: 1;
+      min-width: 300px;
+    }
+    h1, h2 {
+      margin-bottom: 1rem;
+      text-align: center;
+    }
+    input, button {
+      padding: 10px;
+      margin: 10px 0;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+    }
+    input {
+      width: 80%;
+    }
+    button {
+      background: #ff9800;
+      color: white;
+      cursor: pointer;
+      transition: transform 0.2s ease, background 0.2s;
+    }
+    button:hover {
+      transform: scale(1.05);
+      background: #e68900;
+    }
+    .message {
+      margin-top: 1rem;
+      font-weight: bold;
+      text-align: center;
+    }
+    .shake {
+      animation: shake 0.5s;
+    }
+    @keyframes shake {
+      0% { transform: translateX(0); }
+      25% { transform: translateX(-8px); }
+      50% { transform: translateX(8px); }
+      75% { transform: translateX(-8px); }
+      100% { transform: translateX(0); }
+    }
+    canvas#confetti {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 999;
+    }
+    ul {
+      list-style: none;
+      padding: 0;
+    }
+    ul li {
+      margin: 6px 0;
+      background: rgba(255,255,255,0.1);
+      padding: 8px;
+      border-radius: 6px;
+    }
+    /* Center welcome screen */
+    #welcomeScreen {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0, 0, 0, 0.8);
+      padding: 2rem;
+      border-radius: 15px;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.5);
+      text-align: center;
+    }
+    #welcomeScreen input {
+      width: 100%;
+      max-width: 300px;
+    }
+    #welcomeScreen button {
+      width: 150px;
+    }
+    #playerDisplay {
+      font-size: 1.1rem;
+      font-weight: bold;
+      margin-bottom: 1rem;
+      text-align: center;
+      color: #ffcc00;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="confetti"></canvas>
+
+  <!-- Welcome Screen -->
+  <div id="welcomeScreen">
+    <h1>🎮 Guess the Number</h1>
+    <input type="text" id="playerName" placeholder="Enter your name">
+    <br>
+    <button onclick="startGame()">Start Game</button>
+  </div>
+
+  <!-- Game + Leaderboard -->
+  <div class="container" id="mainContainer">
+    <div class="game-box" id="gameContainer">
+      <h1>🎯 Number Guessing</h1>
+      <div id="playerDisplay">👤 Player: </div>
+      <div id="gameArea">
+        <p>Guess a number between 1 and 100</p>
+        <input type="number" id="guess" min="1" max="100">
+        <br>
+        <button onclick="checkGuess()">Submit</button>
+        <button id="resetBtn" onclick="resetGame()">Reset</button>
+        <button id="playAgainBtn" style="display:none;" onclick="resetGame()">Play Again</button>
+        <p class="message" id="message"></p>
+        <button style="margin-top:1rem;" onclick="goBack()">⬅️ Back (New Player)</button>
+      </div>
+    </div>
+
+    <div class="leaderboard-box" id="leaderboardBox">
+      <h2>🏆 Leaderboard</h2>
+      <ul id="leaderboardList"></ul>
+    </div>
+  </div>
+
+  <script>
+    let randomNumber, attempts, player, leaderboard = [];
+
+    if(localStorage.getItem("leaderboard")){
+      leaderboard = JSON.parse(localStorage.getItem("leaderboard"));
+    }
+
+    function startGame(){
+      player = document.getElementById("playerName").value.trim();
+      if(player === ""){
+        alert("Please enter your name!");
+        return;
+      }
+      randomNumber = Math.floor(Math.random() * 100) + 1;
+      attempts = 0;
+      document.getElementById("welcomeScreen").style.display = "none";
+      document.getElementById("mainContainer").style.display = "flex";
+      document.getElementById("playerDisplay").innerText = "👤 Player: " + player;
+      document.getElementById("message").innerText = "";
+      document.getElementById("playAgainBtn").style.display = "none";
+      renderLeaderboard();
+    }
+
+    function checkGuess(){
+      const guessInput = document.getElementById("guess");
+      const guess = Number(guessInput.value);
+      const message = document.getElementById("message");
+      attempts++;
+
+      if(isNaN(guess) || guess < 1 || guess > 100){
+        message.innerText = "⚠️ Enter a number between 1 and 100!";
+        return;
+      }
+
+      if(guess === randomNumber){
+        message.innerText = `🎉 Correct, ${player}! You guessed it in ${attempts} attempts.`;
+        celebrate();
+        updateLeaderboard(player, attempts);
+        document.getElementById("playAgainBtn").style.display = "inline-block";
+      } else {
+        message.innerText = guess < randomNumber ? "📉 Too low! Try again." : "📈 Too high! Try again.";
+        shake();
+        if (navigator.vibrate) navigator.vibrate(300);
+      }
+      guessInput.value = "";
+    }
+
+    function shake(){
+      const container = document.getElementById("gameContainer");
+      container.classList.add("shake");
+      setTimeout(()=>container.classList.remove("shake"), 500);
+    }
+
+    function celebrate(){
+      const confettiCanvas = document.getElementById("confetti");
+      const ctx = confettiCanvas.getContext("2d");
+      confettiCanvas.width = window.innerWidth;
+      confettiCanvas.height = window.innerHeight;
+      let particles = [];
+
+      for(let i=0; i<200; i++){
+        particles.push({
+          x: Math.random() * confettiCanvas.width,
+          y: Math.random() * confettiCanvas.height - confettiCanvas.height,
+          w: 10,
+          h: 10,
+          color: `hsl(${Math.random()*360},100%,50%)`,
+          speed: Math.random()*5+2
+        });
+      }
+
+      function draw(){
+        ctx.clearRect(0,0,confettiCanvas.width,confettiCanvas.height);
+        particles.forEach(p=>{
+          ctx.fillStyle = p.color;
+          ctx.fillRect(p.x,p.y,p.w,p.h);
+          p.y += p.speed;
+          if(p.y > confettiCanvas.height){
+            p.y = -10;
+            p.x = Math.random()*confettiCanvas.width;
+          }
+        });
+        requestAnimationFrame(draw);
+      }
+      draw();
+      setTimeout(()=>ctx.clearRect(0,0,confettiCanvas.width,confettiCanvas.height),5000);
+    }
+
+    function updateLeaderboard(name, attempts){
+      leaderboard.push({name, attempts});
+      leaderboard.sort((a,b)=>a.attempts-b.attempts);
+      leaderboard = leaderboard.slice(0,5);
+      localStorage.setItem("leaderboard", JSON.stringify(leaderboard));
+      renderLeaderboard();
+    }
+
+    function renderLeaderboard(){
+      const list = document.getElementById("leaderboardList");
+      list.innerHTML = "";
+      leaderboard.forEach((entry, i)=>{
+        const li = document.createElement("li");
+        li.innerText = `${i+1}. ${entry.name} - ${entry.attempts} attempts`;
+        list.appendChild(li);
+      });
+    }
+
+    function goBack(){
+      document.getElementById("welcomeScreen").style.display = "flex";
+      document.getElementById("mainContainer").style.display = "none";
+      document.getElementById("playerName").value = "";
+    }
+
+    function resetGame(){
+      randomNumber = Math.floor(Math.random() * 100) + 1;
+      attempts = 0;
+      document.getElementById("message").innerText = "";
+      document.getElementById("guess").value = "";
+      document.getElementById("playAgainBtn").style.display = "none";
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,118 @@
+body {
+  font-family: 'Arial', sans-serif;
+  background: linear-gradient(135deg, #89f7fe, #66a6ff);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  margin: 0;
+}
+
+/* Common container styles */
+.game-container, .welcome-container {
+  background: white;
+  padding: 30px;
+  border-radius: 12px;
+  text-align: center;
+  box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+  width: 350px;
+}
+
+/* Hidden state */
+.hidden {
+  display: none;
+}
+
+/* Title */
+h1 {
+  font-size: 24px;
+  color: #333;
+  margin-bottom: 15px;
+}
+
+/* Inputs */
+input[type="text"],
+input[type="number"] {
+  padding: 10px;
+  width: 100%;
+  margin: 10px 0;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 16px;
+  text-align: center;
+}
+
+/* Buttons */
+button {
+  background-color: #28a745;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: 0.2s;
+  width: 100%;
+  margin-top: 10px;
+}
+
+button:hover {
+  background-color: #218838;
+}
+
+/* Reset button */
+.reset-btn {
+  background-color: #dc3545;
+}
+
+.reset-btn:hover {
+  background-color: #c82333;
+}
+
+/* Back button */
+.back-btn {
+  background-color: #6c757d;
+}
+
+.back-btn:hover {
+  background-color: #5a6268;
+}
+
+/* Feedback */
+#feedback {
+  font-size: 18px;
+  margin-top: 15px;
+  font-weight: bold;
+}
+
+#feedback.success {
+  color: green;
+}
+
+#feedback.error {
+  color: red;
+}
+
+/* Leaderboard */
+#leaderboard {
+  margin-top: 20px;
+  text-align: left;
+}
+
+#leaderboard h2 {
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+
+#leaderboardList {
+  list-style: none;
+  padding: 0;
+}
+
+#leaderboardList li {
+  background: #f8f9fa;
+  padding: 8px;
+  border-radius: 6px;
+  margin: 5px 0;
+  font-size: 14px;
+}
